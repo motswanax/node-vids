@@ -1,14 +1,6 @@
-const mongoose = require("mongoose");
+const { Genre, validate } = require("../models/genre");
 const express = require("express");
 const router = express.Router();
-const Joi = require("joi"); // Pascal case for classes
-
-// Define schema
-const genreSchema = new mongoose.Schema({
-  name: { type: String, required: true, minlength: 5, maxlength: 50 },
-});
-
-const Genre = mongoose.model("Genre", genreSchema);
 
 // Get all.
 router.get("/", async (req, res) => {
@@ -27,20 +19,20 @@ router.get("/:id", async (req, res) => {
 });
 
 // Create.
-router.post('/', async (req, res) => {
-  const { error } = validateGenre(req.body); 
+router.post("/", async (req, res) => {
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   let genre = new Genre({ name: req.body.name });
   genre = await genre.save();
-  
+
   res.send(genre);
 });
 
 // Update record.
 router.put("/:id", async (req, res) => {
   // Validate input.
-  const { error } = validateGenre(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].mesage);
 
   const genre = await Genre.findByIdAndUpdate(
@@ -68,14 +60,5 @@ router.delete("/:id", async (req, res) => {
 
   res.send(genre);
 });
-
-function validateGenre(genre) {
-  const schema = Joi.object({
-    name: Joi.string().min(3).required(),
-  });
-
-  const { error, value } = schema.validate(genre);
-  return { error, value };
-}
 
 module.exports = router;

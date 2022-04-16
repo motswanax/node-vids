@@ -16,6 +16,8 @@ const movieSchema = new mongoose.Schema({
   dailyRentalRate: { type: Number, required: true, min: 0, max: 255 },
 });
 
+const Movie = mongoose.model("Movies", movieSchema);
+
 function validateMovie(movie) {
   const schema = Joi.object({
     title: Joi.string().min(2).max(255).required(),
@@ -27,3 +29,6 @@ function validateMovie(movie) {
   const { error, value } = schema.validate(movie);
   return { error, value };
 }
+
+exports.Movie = Movie;
+exports.validate = validateMovie;
